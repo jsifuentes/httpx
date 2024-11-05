@@ -56,6 +56,7 @@ type Result struct {
 	ResponseBody       string                        `json:"body,omitempty" csv:"body" mapstructure:"body"`
 	BodyPreview        string                        `json:"body_preview,omitempty" csv:"body_preview" mapstructure:"body_preview"`
 	ContentType        string                        `json:"content_type,omitempty" csv:"content_type" mapstructure:"content_type"`
+	RequestHostHeader  string                        `json:"request_host_header,omitempty" csv:"request_host_header" mapstructure:"request_host_header"`
 	Method             string                        `json:"method,omitempty" csv:"method" mapstructure:"method"`
 	Host               string                        `json:"host,omitempty" csv:"host" mapstructure:"host"`
 	Path               string                        `json:"path,omitempty" csv:"path" mapstructure:"path"`

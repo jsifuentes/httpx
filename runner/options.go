@@ -271,6 +271,7 @@ type Options struct {
 	Stream                    bool
 	SkipDedupe                bool
 	ProbeAllIPS               bool
+	CustomHosts               goflags.StringSlice
 	Resolvers                 goflags.StringSlice
 	Favicon                   bool
 	OutputFilterFavicon       goflags.StringSlice
@@ -482,6 +483,7 @@ func ParseOptions() *Options {
 		flagSet.BoolVarP(&options.FollowHostRedirects, "follow-host-redirects", "fhr", false, "follow redirects on the same host"),
 		flagSet.BoolVarP(&options.RespectHSTS, "respect-hsts", "rhsts", false, "respect HSTS response headers for redirect requests"),
 		flagSet.BoolVar(&options.VHostInput, "vhost-input", false, "get a list of vhosts as input"),
+		flagSet.StringSliceVarP(&options.CustomHosts, "custom-hosts", "ch", nil, "try a list of names in the Host header for every target IP", goflags.NormalizedStringSliceOptions),
 		flagSet.StringVar(&options.Methods, "x", "", "request methods to probe, use 'all' to probe all HTTP methods"),
 		flagSet.StringVar(&options.RequestBody, "body", "", "post body to include in http request"),
 		flagSet.BoolVarP(&options.Stream, "stream", "s", false, "stream mode - start elaborating input targets without sorting"),

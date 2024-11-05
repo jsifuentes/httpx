@@ -1512,7 +1512,13 @@ func (r *Runner) targets(hp *httpx.HTTPX, target string) chan httpx.Target {
 			idxComma := strings.Index(target, ",")
 			results <- httpx.Target{Host: target[idxComma+1:], CustomHost: target[:idxComma]}
 		default:
-			results <- httpx.Target{Host: target}
+			if len(r.options.CustomHosts) > 0 {
+				for _, customHost := range r.options.CustomHosts {
+					results <- httpx.Target{Host: target, CustomHost: customHost}
+				}
+			} else {
+				results <- httpx.Target{Host: target}
+			}
 		}
 	}()
 	return results
@@ -1826,6 +1832,8 @@ retry:
 	if scanopts.OutputServerHeader {
 		builder.WriteString(fmt.Sprintf(" [%s]", serverHeader))
 	}
+
+	requestHostHeader := req.Host
 
 	var (
 		serverResponseRaw  string
@@ -2226,57 +2234,58 @@ retry:
 	}
 
 	result := Result{
-		Timestamp:        time.Now(),
-		Request:          request,
-		ResponseHeaders:  responseHeaders,
-		RawHeaders:       rawResponseHeaders,
-		Scheme:           parsed.Scheme,
-		Port:             finalPort,
-		Path:             finalPath,
-		Raw:              resp.Raw,
-		URL:              fullURL,
-		Input:            origInput,
-		ContentLength:    resp.ContentLength,
-		ChainStatusCodes: chainStatusCodes,
-		Chain:            chainItems,
-		StatusCode:       resp.StatusCode,
-		Location:         resp.GetHeaderPart("Location", ";"),
-		ContentType:      resp.GetHeaderPart("Content-Type", ";"),
-		Title:            title,
-		str:              builder.String(),
-		VHost:            isvhost,
-		WebServer:        serverHeader,
-		ResponseBody:     serverResponseRaw,
-		BodyPreview:      bodyPreview,
-		WebSocket:        isWebSocket,
-		TLSData:          resp.TLSData,
-		CSPData:          resp.CSPData,
-		Pipeline:         pipeline,
-		HTTP2:            http2,
-		Method:           method,
-		Host:             ip,
-		A:                ips4,
-		AAAA:             ips6,
-		CNAMEs:           cnames,
-		CDN:              isCDN,
-		CDNName:          cdnName,
-		CDNType:          cdnType,
-		ResponseTime:     resp.Duration.String(),
-		Technologies:     technologies,
-		FinalURL:         finalURL,
-		FavIconMMH3:      faviconMMH3,
-		FavIconMD5:       faviconMD5,
-		FaviconPath:      faviconPath,
-		FaviconURL:       faviconURL,
-		Hashes:           hashesMap,
-		Extracts:         extractResult,
-		JarmHash:         jarmhash,
-		Lines:            resp.Lines,
-		Words:            resp.Words,
-		ASN:              asnResponse,
-		ExtractRegex:     extractRegex,
-		ScreenshotBytes:  screenshotBytes,
-		HeadlessBody:     headlessBody,
+		Timestamp:         time.Now(),
+		Request:           request,
+		ResponseHeaders:   responseHeaders,
+		RawHeaders:        rawResponseHeaders,
+		Scheme:            parsed.Scheme,
+		Port:              finalPort,
+		Path:              finalPath,
+		Raw:               resp.Raw,
+		URL:               fullURL,
+		Input:             origInput,
+		ContentLength:     resp.ContentLength,
+		ChainStatusCodes:  chainStatusCodes,
+		Chain:             chainItems,
+		StatusCode:        resp.StatusCode,
+		Location:          resp.GetHeaderPart("Location", ";"),
+		ContentType:       resp.GetHeaderPart("Content-Type", ";"),
+		Title:             title,
+		str:               builder.String(),
+		VHost:             isvhost,
+		WebServer:         serverHeader,
+		RequestHostHeader: requestHostHeader,
+		ResponseBody:      serverResponseRaw,
+		BodyPreview:       bodyPreview,
+		WebSocket:         isWebSocket,
+		TLSData:           resp.TLSData,
+		CSPData:           resp.CSPData,
+		Pipeline:          pipeline,
+		HTTP2:             http2,
+		Method:            method,
+		Host:              ip,
+		A:                 ips4,
+		AAAA:              ips6,
+		CNAMEs:            cnames,
+		CDN:               isCDN,
+		CDNName:           cdnName,
+		CDNType:           cdnType,
+		ResponseTime:      resp.Duration.String(),
+		Technologies:      technologies,
+		FinalURL:          finalURL,
+		FavIconMMH3:       faviconMMH3,
+		FavIconMD5:        faviconMD5,
+		FaviconPath:       faviconPath,
+		FaviconURL:        faviconURL,
+		Hashes:            hashesMap,
+		Extracts:          extractResult,
+		JarmHash:          jarmhash,
+		Lines:             resp.Lines,
+		Words:             resp.Words,
+		ASN:               asnResponse,
+		ExtractRegex:      extractRegex,
+		ScreenshotBytes:   screenshotBytes,
+		HeadlessBody:      headlessBody,
 		KnowledgeBase: map[string]interface{}{
 			"PageType": r.pageTypeClassifier.Classify(respData),
 			"pHash":    pHash,
