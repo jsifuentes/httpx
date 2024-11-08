@@ -1514,6 +1514,21 @@ func (r *Runner) targets(hp *httpx.HTTPX, target string) chan httpx.Target {
 		default:
 			if len(r.options.CustomHosts) > 0 {
 				for _, customHost := range r.options.CustomHosts {
+					// maybe it's a file with a list of custom hosts?
+					if fileutil.FileExists(customHost) {
+						customHostsCh, err := fileutil.ReadFile(customHost)
+						if err != nil {
+							gologger.Error().Msgf("Could not read custom hosts from file '%s': %s\n", customHost, err)
+							continue
+						}
+
+						for customHost := range customHostsCh {
+							results <- httpx.Target{Host: target, CustomHost: customHost}
+						}
+
+						continue
+					}
+
 					results <- httpx.Target{Host: target, CustomHost: customHost}
 				}
 			} else {
